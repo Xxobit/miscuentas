@@ -1,0 +1,532 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Mis Cuentas">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="icon-192.png">
+<meta name="theme-color" content="#0f766e">
+<title>Mis Cuentas</title>
+<style>
+:root{
+  --bg:#f4f6f5; --card:#ffffff; --text:#14201d; --muted:#5f6f6a; --line:#e2e8e6;
+  --brand:#0f766e; --brand-soft:#d7efec; --in:#15803d; --out:#b91c1c; --warn:#b45309;
+  --shadow:0 1px 3px rgba(0,0,0,.06);
+}
+@media (prefers-color-scheme: dark){
+  :root{--bg:#0e1514; --card:#17211f; --text:#e7efed; --muted:#93a5a0; --line:#26332f;
+  --brand:#2dd4bf; --brand-soft:#123a35; --in:#4ade80; --out:#f87171; --warn:#fbbf24; --shadow:none;}
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font:16px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;-webkit-text-size-adjust:100%}
+header{position:sticky;top:0;z-index:5;background:var(--brand);color:#fff;padding:calc(10px + env(safe-area-inset-top)) 16px 10px}
+@media (prefers-color-scheme: dark){header{color:#06201c}}
+.hrow{display:flex;align-items:center;justify-content:space-between;gap:8px;max-width:720px;margin:0 auto}
+header h1{font-size:18px;margin:0}
+.month{display:flex;align-items:center;gap:6px}
+.month button{background:rgba(255,255,255,.2);color:inherit;border:0;border-radius:8px;width:34px;height:34px;font-size:18px}
+.month span{min-width:120px;text-align:center;font-weight:600}
+main{max-width:720px;margin:0 auto;padding:14px 16px calc(90px + env(safe-area-inset-bottom))}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px;box-shadow:var(--shadow)}
+.card h2{font-size:15px;margin:0 0 10px;color:var(--muted);font-weight:600}
+.big{font-size:30px;font-weight:700;letter-spacing:-.5px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat{background:var(--bg);border-radius:10px;padding:10px}
+.stat small{display:block;color:var(--muted);font-size:12px}
+.stat b{font-size:18px}
+.pos{color:var(--in)} .neg{color:var(--out)} .muted{color:var(--muted)}
+.bar{height:8px;background:var(--line);border-radius:6px;overflow:hidden;margin-top:4px}
+.bar i{display:block;height:100%;background:var(--brand);border-radius:6px}
+.bar i.over{background:var(--out)}
+.row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.row:last-child{border-bottom:0}
+.row .grow{flex:1;min-width:0}
+.row .t{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .s{font-size:12px;color:var(--muted)}
+.amt{font-weight:700;white-space:nowrap}
+.chip{display:inline-block;font-size:11px;padding:2px 7px;border-radius:20px;background:var(--brand-soft);color:var(--brand);font-weight:600}
+.chk{width:26px;height:26px;border-radius:50%;border:2px solid var(--line);background:transparent;flex:none;display:grid;place-items:center;color:#fff;font-size:14px}
+.chk.on{background:var(--in);border-color:var(--in)}
+.btn{border:0;border-radius:10px;padding:11px 14px;font-weight:600;font-size:15px;background:var(--brand);color:#fff}
+@media (prefers-color-scheme: dark){.btn{color:#06201c}}
+.btn.sec{background:var(--brand-soft);color:var(--brand)}
+.btn.danger{background:transparent;color:var(--out);border:1px solid var(--out)}
+.btn.block{width:100%}
+.icon{background:transparent;border:0;color:var(--muted);font-size:18px;padding:4px 6px}
+nav{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--line);display:flex;justify-content:center;padding-bottom:env(safe-area-inset-bottom);z-index:5}
+nav .in{display:flex;max-width:720px;width:100%}
+nav button{flex:1;background:none;border:0;padding:9px 0 8px;color:var(--muted);font-size:11px;font-weight:600}
+nav button span{display:block;font-size:20px;line-height:1.2}
+nav button.act{color:var(--brand)}
+.fab{position:fixed;right:18px;bottom:calc(76px + env(safe-area-inset-bottom));width:56px;height:56px;border-radius:50%;border:0;background:var(--brand);color:#fff;font-size:30px;box-shadow:0 4px 12px rgba(0,0,0,.25);z-index:6}
+@media (prefers-color-scheme: dark){.fab{color:#06201c}}
+.sheet-bg{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;z-index:20;align-items:flex-end;justify-content:center}
+.sheet-bg.open{display:flex}
+.sheet{background:var(--card);width:100%;max-width:560px;border-radius:18px 18px 0 0;padding:16px 16px calc(18px + env(safe-area-inset-bottom));max-height:92vh;overflow:auto}
+.sheet h3{margin:0 0 12px}
+label{display:block;font-size:13px;color:var(--muted);margin:10px 0 4px;font-weight:600}
+input,select{width:100%;font-size:16px;padding:11px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--text)}
+.seg{display:flex;background:var(--bg);border-radius:10px;padding:3px;gap:3px}
+.seg button{flex:1;border:0;background:none;padding:9px;border-radius:8px;font-weight:600;color:var(--muted);font-size:15px}
+.seg button.on.out{background:var(--out);color:#fff}
+.seg button.on.in{background:var(--in);color:#fff}
+.seg button.on.neu{background:var(--brand);color:#fff}
+.actions{display:flex;gap:8px;margin-top:16px}
+.actions .btn{flex:1}
+.empty{text-align:center;color:var(--muted);padding:18px 0;font-size:14px}
+.banner{background:#fef3c7;color:#78350f;border-radius:12px;padding:10px 12px;font-size:14px;margin-bottom:12px}
+@media (prefers-color-scheme: dark){.banner{background:#3b2a07;color:#fde68a}}
+.yr{display:flex;align-items:flex-end;gap:4px;height:120px;margin-top:6px}
+.yr>div{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:2px}
+.yr .b{width:100%;border-radius:4px 4px 0 0;min-height:2px}
+.yr small{font-size:10px;color:var(--muted)}
+.hidden{display:none}
+p.help{font-size:14px;color:var(--muted);margin:6px 0}
+</style>
+</head>
+<body>
+<header>
+  <div class="hrow">
+    <h1>Mis Cuentas</h1>
+    <div class="month">
+      <button id="prevM" aria-label="Mes anterior">‹</button>
+      <span id="monthLbl"></span>
+      <button id="nextM" aria-label="Mes siguiente">›</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div id="storageWarn" class="banner hidden">⚠️ Este navegador no permite guardar datos. Usa “Guardar copia” en Ajustes antes de cerrar o perderás los cambios.</div>
+  <div id="backupWarn" class="banner hidden"></div>
+
+  <!-- RESUMEN -->
+  <section id="v-resumen">
+    <div class="card">
+      <h2>Te queda este mes</h2>
+      <div class="big" id="sBalance">0 €</div>
+      <p class="help" id="sDaily"></p>
+      <div class="grid2" style="margin-top:10px">
+        <div class="stat"><small>Ingresos</small><b class="pos" id="sIn">0 €</b></div>
+        <div class="stat"><small>Gastos totales</small><b class="neg" id="sOut">0 €</b></div>
+        <div class="stat"><small>Gastos fijos</small><b id="sFix">0 €</b></div>
+        <div class="stat"><small>Gastos variables</small><b id="sVar">0 €</b></div>
+      </div>
+    </div>
+    <div class="card" id="budgetCard">
+      <h2>Presupuesto de gastos variables</h2>
+      <div id="budgetBox"></div>
+    </div>
+    <div class="card">
+      <h2>Fijos pendientes de pagar este mes</h2>
+      <div id="pendList"></div>
+    </div>
+    <div class="card">
+      <h2>Gasto por categoría</h2>
+      <div id="catList"></div>
+    </div>
+    <div class="card">
+      <h2>Año <span id="yrLbl"></span> — balance mensual</h2>
+      <div class="yr" id="yrChart"></div>
+      <p class="help" id="yrTotal"></p>
+    </div>
+  </section>
+
+  <!-- MOVIMIENTOS -->
+  <section id="v-movs" class="hidden">
+    <div class="card">
+      <h2>Fijos del mes <span class="muted" style="font-weight:400">(toca ✓ cuando se cobre/pague)</span></h2>
+      <div id="fixMonthList"></div>
+    </div>
+    <div class="card">
+      <h2>Movimientos variables</h2>
+      <div id="movList"></div>
+    </div>
+  </section>
+
+  <!-- FIJOS -->
+  <section id="v-fijos" class="hidden">
+    <div class="card">
+      <h2>Ingresos fijos</h2>
+      <div id="fixInList"></div>
+    </div>
+    <div class="card">
+      <h2>Gastos fijos</h2>
+      <div id="fixOutList"></div>
+    </div>
+    <button class="btn block" id="addFixBtn">+ Añadir fijo</button>
+    <p class="help">Los fijos se repiten automáticamente cada mes. Si un mes cambia el importe (p. ej. la luz), ajústalo desde “Movimientos” solo para ese mes.</p>
+  </section>
+
+  <!-- AJUSTES -->
+  <section id="v-ajustes" class="hidden">
+    <div class="card">
+      <h2>Copia de seguridad / pasar datos entre dispositivos</h2>
+      <p class="help">Todo se guarda solo en este dispositivo. Para pasar los datos al otro (móvil ↔ ordenador), guarda una copia aquí y cárgala allí.</p>
+      <p class="help" id="lastBackup"></p>
+      <div class="actions">
+        <button class="btn" id="expBtn">Guardar copia</button>
+        <button class="btn sec" id="impBtn">Cargar copia</button>
+      </div>
+      <input type="file" id="impFile" accept=".json,application/json" class="hidden">
+      <div class="actions"><button class="btn sec" id="csvBtn">Exportar a Excel (CSV)</button></div>
+    </div>
+    <div class="card">
+      <h2>Presupuesto mensual para gastos variables</h2>
+      <input type="text" inputmode="decimal" id="budgetIn" placeholder="Ej. 400 (déjalo vacío si no quieres)">
+    </div>
+    <div class="card">
+      <h2>Categorías</h2>
+      <div id="catEdit"></div>
+      <div class="actions"><input id="newCat" placeholder="Nueva categoría"><button class="btn" id="addCatBtn" style="flex:none">Añadir</button></div>
+    </div>
+    <div class="card">
+      <h2>Zona peligrosa</h2>
+      <button class="btn danger block" id="wipeBtn">Borrar todos los datos</button>
+    </div>
+  </section>
+</main>
+
+<button class="fab" id="fab" aria-label="Añadir movimiento">+</button>
+
+<nav><div class="in">
+  <button data-v="resumen" class="act"><span>📊</span>Resumen</button>
+  <button data-v="movs"><span>🧾</span>Movimientos</button>
+  <button data-v="fijos"><span>📌</span>Fijos</button>
+  <button data-v="ajustes"><span>⚙️</span>Ajustes</button>
+</div></nav>
+
+<!-- Hoja: movimiento -->
+<div class="sheet-bg" id="movSheet"><div class="sheet">
+  <h3 id="movTitle">Nuevo movimiento</h3>
+  <div class="seg" id="movType">
+    <button data-t="gasto" class="on out">Gasto</button>
+    <button data-t="ingreso">Ingreso</button>
+  </div>
+  <label>Importe (€)</label><input type="text" inputmode="decimal" id="mAmt">
+  <label>Concepto</label><input id="mCon" placeholder="Ej. Supermercado">
+  <label>Categoría</label><select id="mCat"></select>
+  <label>Fecha</label><input type="date" id="mDate">
+  <div class="actions">
+    <button class="btn danger hidden" id="mDel">Borrar</button>
+    <button class="btn sec" data-close>Cancelar</button>
+    <button class="btn" id="mSave">Guardar</button>
+  </div>
+</div></div>
+
+<!-- Hoja: fijo -->
+<div class="sheet-bg" id="fixSheet"><div class="sheet">
+  <h3 id="fixTitle">Nuevo fijo</h3>
+  <div class="seg" id="fixType">
+    <button data-t="gasto" class="on out">Gasto fijo</button>
+    <button data-t="ingreso">Ingreso fijo</button>
+  </div>
+  <label>Nombre</label><input id="fName" placeholder="Ej. Alquiler, Nómina, Internet…">
+  <label>Importe mensual (€)</label><input type="text" inputmode="decimal" id="fAmt">
+  <label>Categoría</label><select id="fCat"></select>
+  <label>Día del mes (opcional)</label><input type="number" inputmode="numeric" min="1" max="31" id="fDay">
+  <label>Empieza en</label><input type="month" id="fFrom">
+  <label>Termina en (opcional)</label><input type="month" id="fTo">
+  <div class="actions">
+    <button class="btn danger hidden" id="fDel">Borrar</button>
+    <button class="btn sec" data-close>Cancelar</button>
+    <button class="btn" id="fSave">Guardar</button>
+  </div>
+</div></div>
+
+<!-- Hoja: ajuste de fijo solo este mes -->
+<div class="sheet-bg" id="ovSheet"><div class="sheet">
+  <h3 id="ovTitle">Importe este mes</h3>
+  <p class="help">Cambia el importe solo para este mes (el resto de meses no se tocan).</p>
+  <label>Importe (€)</label><input type="text" inputmode="decimal" id="ovAmt">
+  <div class="actions">
+    <button class="btn sec" id="ovReset">Volver al normal</button>
+    <button class="btn sec" data-close>Cancelar</button>
+    <button class="btn" id="ovSave">Guardar</button>
+  </div>
+</div></div>
+
+<script>
+(function(){
+"use strict";
+const KEY = "miscuentas.v1";
+const DEFAULT_CATS = ["Vivienda","Suministros","Comida","Transporte","Salud","Ocio","Ropa","Educación","Suscripciones","Seguros","Regalos","Otros","Nómina","Extras"];
+let canStore = true;
+
+function blank(){ return {version:1, fixed:[], moves:[], paid:{}, overrides:{}, budget:null, cats:DEFAULT_CATS.slice(), lastBackup:null}; }
+function load(){
+  try{ const raw = localStorage.getItem(KEY); if(raw){ const d = JSON.parse(raw); return Object.assign(blank(), d); } }
+  catch(e){ canStore = false; }
+  try{ localStorage.setItem(KEY+".test","1"); localStorage.removeItem(KEY+".test"); }catch(e){ canStore = false; }
+  return blank();
+}
+let D = load();
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(D)); }catch(e){ canStore = false; } render(); }
+
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+const eur = n => (Math.round(n*100)/100).toLocaleString("es-ES",{style:"currency",currency:"EUR"});
+const uid = () => Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const esc = s => String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const pad = n => String(n).padStart(2,"0");
+const ymOf = d => d.getFullYear()+"-"+pad(d.getMonth()+1);
+const today = new Date();
+let cur = ymOf(today);
+let view = "resumen";
+
+function monthName(ym){ const [y,m]=ym.split("-").map(Number); const s=new Date(y,m-1,1).toLocaleDateString("es-ES",{month:"long",year:"numeric"}); return s.charAt(0).toUpperCase()+s.slice(1); }
+function shiftMonth(ym,k){ const [y,m]=ym.split("-").map(Number); return ymOf(new Date(y,m-1+k,1)); }
+function daysIn(ym){ const [y,m]=ym.split("-").map(Number); return new Date(y,m,0).getDate(); }
+
+function fixedFor(ym){
+  return D.fixed.filter(f => (!f.from || f.from<=ym) && (!f.to || f.to>=ym))
+    .map(f => { const ov = D.overrides[ym]?.[f.id]; return Object.assign({}, f, {amt: ov!=null ? ov : f.amount, overridden: ov!=null, paid: !!D.paid[ym]?.[f.id]}); })
+    .sort((a,b)=>(a.day||99)-(b.day||99));
+}
+function movesFor(ym){ return D.moves.filter(m => m.date.slice(0,7)===ym).sort((a,b)=>b.date.localeCompare(a.date)); }
+
+function totals(ym){
+  const fx = fixedFor(ym), mv = movesFor(ym);
+  const fixIn = fx.filter(f=>f.type==="ingreso").reduce((s,f)=>s+f.amt,0);
+  const fixOut = fx.filter(f=>f.type==="gasto").reduce((s,f)=>s+f.amt,0);
+  const varIn = mv.filter(m=>m.type==="ingreso").reduce((s,m)=>s+m.amount,0);
+  const varOut = mv.filter(m=>m.type==="gasto").reduce((s,m)=>s+m.amount,0);
+  return {fx, mv, fixIn, fixOut, varIn, varOut, inc: fixIn+varIn, out: fixOut+varOut, bal: fixIn+varIn-fixOut-varOut};
+}
+
+/* ---------- RENDER ---------- */
+function render(){
+  $("#monthLbl").textContent = monthName(cur);
+  $("#storageWarn").classList.toggle("hidden", canStore);
+  const hasData = D.fixed.length || D.moves.length;
+  const days = D.lastBackup ? Math.floor((Date.now()-D.lastBackup)/864e5) : null;
+  const bw = $("#backupWarn");
+  if(hasData && (days===null || days>=14)){
+    bw.textContent = days===null ? "💾 Aún no has guardado ninguna copia. Hazlo en Ajustes → Guardar copia." : `💾 Hace ${days} días de tu última copia. Conviene guardar una nueva en Ajustes.`;
+    bw.classList.remove("hidden");
+  } else bw.classList.add("hidden");
+
+  const T = totals(cur);
+  // Resumen
+  $("#sBalance").textContent = eur(T.bal);
+  $("#sBalance").className = "big " + (T.bal<0?"neg":"pos");
+  $("#sIn").textContent = eur(T.inc); $("#sOut").textContent = eur(T.out);
+  $("#sFix").textContent = eur(T.fixOut); $("#sVar").textContent = eur(T.varOut);
+  const isCur = cur===ymOf(today);
+  if(isCur){
+    const left = daysIn(cur) - today.getDate() + 1;
+    $("#sDaily").textContent = T.bal>0 ? `Puedes gastar unos ${eur(T.bal/left)} al día durante los ${left} días que quedan.` : (T.bal<0 ? "Este mes vas en negativo." : "");
+  } else {
+    const pct = T.inc>0 ? Math.round(T.bal/T.inc*100) : null;
+    $("#sDaily").textContent = pct!=null ? `Ahorro del ${pct}% de los ingresos.` : "";
+  }
+  // Presupuesto
+  const bc = $("#budgetBox");
+  if(D.budget){
+    const p = Math.min(100, T.varOut/D.budget*100), over = T.varOut>D.budget;
+    bc.innerHTML = `<div style="display:flex;justify-content:space-between"><b>${eur(T.varOut)}</b><span class="muted">de ${eur(D.budget)}</span></div>
+      <div class="bar"><i class="${over?"over":""}" style="width:${p}%"></i></div>
+      <p class="help ${over?"neg":""}">${over?`Te has pasado ${eur(T.varOut-D.budget)}`:`Te quedan ${eur(D.budget-T.varOut)} para variables`}</p>`;
+  } else bc.innerHTML = `<p class="help">Sin presupuesto. Puedes fijar uno en Ajustes.</p>`;
+  // Pendientes
+  const pend = T.fx.filter(f=>!f.paid);
+  $("#pendList").innerHTML = pend.length ? pend.map(f=>`<div class="row"><div class="grow"><div class="t">${esc(f.name)}</div><div class="s">${f.day?"Día "+f.day+" · ":""}${f.type==="ingreso"?"Ingreso":"Gasto"}</div></div><div class="amt ${f.type==="ingreso"?"pos":"neg"}">${f.type==="ingreso"?"+":"−"}${eur(f.amt)}</div></div>`).join("") : `<div class="empty">${T.fx.length?"Todo al día ✓":"Aún no tienes fijos. Añádelos en la pestaña Fijos."}</div>`;
+  // Categorías
+  const cats = {};
+  T.fx.filter(f=>f.type==="gasto").forEach(f=>cats[f.category]=(cats[f.category]||0)+f.amt);
+  T.mv.filter(m=>m.type==="gasto").forEach(m=>cats[m.category]=(cats[m.category]||0)+m.amount);
+  const ce = Object.entries(cats).sort((a,b)=>b[1]-a[1]);
+  const maxc = ce.length? ce[0][1] : 1;
+  $("#catList").innerHTML = ce.length ? ce.map(([c,v])=>`<div style="margin:8px 0"><div style="display:flex;justify-content:space-between;font-size:14px"><span>${esc(c)}</span><b>${eur(v)} <span class="muted" style="font-weight:400">${T.out?Math.round(v/T.out*100):0}%</span></b></div><div class="bar"><i style="width:${v/maxc*100}%"></i></div></div>`).join("") : `<div class="empty">Sin gastos este mes</div>`;
+  // Año
+  const y = cur.slice(0,4); $("#yrLbl").textContent = y;
+  const months = Array.from({length:12},(_,i)=>y+"-"+pad(i+1)).map(ym=>({ym, b: totals(ym).bal}));
+  const mx = Math.max(1,...months.map(m=>Math.abs(m.b)));
+  $("#yrChart").innerHTML = months.map(m=>`<div title="${monthName(m.ym)}: ${eur(m.b)}"><div class="b" style="height:${Math.abs(m.b)/mx*100}%;background:${m.b<0?"var(--out)":"var(--in)"};${m.ym===cur?"outline:2px solid var(--brand)":""}"></div><small>${"EFMAMJJASOND"[+m.ym.slice(5)-1]}</small></div>`).join("");
+  const ytd = months.filter(m=>m.ym<=ymOf(today)).reduce((s,m)=>s+m.b,0);
+  $("#yrTotal").textContent = `Ahorro acumulado del año hasta hoy: ${eur(ytd)}`;
+
+  // Movimientos: fijos del mes
+  $("#fixMonthList").innerHTML = T.fx.length ? T.fx.map(f=>`<div class="row">
+      <button class="chk ${f.paid?"on":""}" data-paid="${f.id}" aria-label="Marcar pagado">${f.paid?"✓":""}</button>
+      <div class="grow"><div class="t">${esc(f.name)}</div><div class="s">${esc(f.category)}${f.day?" · día "+f.day:""}${f.overridden?" · <b>ajustado este mes</b>":""}</div></div>
+      <button class="icon amt ${f.type==="ingreso"?"pos":"neg"}" data-ov="${f.id}">${f.type==="ingreso"?"+":"−"}${eur(f.amt)} ✎</button></div>`).join("") : `<div class="empty">No hay fijos para este mes</div>`;
+  // Movimientos variables
+  $("#movList").innerHTML = T.mv.length ? T.mv.map(m=>`<div class="row" data-mov="${m.id}" style="cursor:pointer">
+      <div class="grow"><div class="t">${esc(m.concept||m.category)}</div><div class="s">${new Date(m.date+"T12:00").toLocaleDateString("es-ES",{day:"numeric",month:"short"})} · <span class="chip">${esc(m.category)}</span></div></div>
+      <div class="amt ${m.type==="ingreso"?"pos":"neg"}">${m.type==="ingreso"?"+":"−"}${eur(m.amount)}</div></div>`).join("") : `<div class="empty">Pulsa + para añadir un gasto o ingreso</div>`;
+
+  // Fijos (definiciones)
+  const fixRow = f => `<div class="row" data-fix="${f.id}" style="cursor:pointer"><div class="grow"><div class="t">${esc(f.name)}</div><div class="s">${esc(f.category)}${f.day?" · día "+f.day:""}${f.to?" · hasta "+monthName(f.to):""}</div></div><div class="amt">${eur(f.amount)}</div></div>`;
+  const fin = D.fixed.filter(f=>f.type==="ingreso"), fout = D.fixed.filter(f=>f.type==="gasto");
+  $("#fixInList").innerHTML = fin.length ? fin.map(fixRow).join("") + `<p class="help" style="text-align:right">Total: <b>${eur(fin.filter(f=>!f.to||f.to>=cur).reduce((s,f)=>s+f.amount,0))}</b>/mes</p>` : `<div class="empty">Ej. tu nómina</div>`;
+  $("#fixOutList").innerHTML = fout.length ? fout.map(fixRow).join("") + `<p class="help" style="text-align:right">Total: <b>${eur(fout.filter(f=>!f.to||f.to>=cur).reduce((s,f)=>s+f.amount,0))}</b>/mes</p>` : `<div class="empty">Ej. alquiler, luz, móvil, seguros…</div>`;
+
+  // Ajustes
+  $("#lastBackup").textContent = D.lastBackup ? "Última copia: " + new Date(D.lastBackup).toLocaleString("es-ES") : "Todavía no has guardado ninguna copia.";
+  if(document.activeElement!==$("#budgetIn")) $("#budgetIn").value = D.budget ?? "";
+  $("#catEdit").innerHTML = D.cats.map((c,i)=>`<div class="row"><div class="grow">${esc(c)}</div><button class="icon" data-delcat="${i}" aria-label="Quitar">✕</button></div>`).join("");
+  const opts = D.cats.map(c=>`<option>${esc(c)}</option>`).join("");
+  $("#mCat").innerHTML = opts; $("#fCat").innerHTML = opts;
+
+  $("#fab").classList.toggle("hidden", !(view==="resumen"||view==="movs"));
+}
+
+/* ---------- NAV ---------- */
+$$("nav button").forEach(b=>b.onclick=()=>{
+  view = b.dataset.v;
+  $$("nav button").forEach(x=>x.classList.toggle("act",x===b));
+  ["resumen","movs","fijos","ajustes"].forEach(v=>$("#v-"+v).classList.toggle("hidden",v!==view));
+  window.scrollTo(0,0); render();
+});
+$("#prevM").onclick=()=>{cur=shiftMonth(cur,-1);render();};
+$("#nextM").onclick=()=>{cur=shiftMonth(cur,1);render();};
+
+/* ---------- SHEETS ---------- */
+function openS(id){ $(id).classList.add("open"); }
+function closeS(){ $$(".sheet-bg").forEach(s=>s.classList.remove("open")); }
+$$("[data-close]").forEach(b=>b.onclick=closeS);
+$$(".sheet-bg").forEach(s=>s.addEventListener("click",e=>{ if(e.target===s) closeS(); }));
+function segSet(seg,t){ $$(seg+" button").forEach(b=>{ const on=b.dataset.t===t; b.className = on ? "on "+(t==="ingreso"?"in":"out") : ""; }); }
+function segGet(seg){ return $(seg+" button.on").dataset.t; }
+$$("#movType button").forEach(b=>b.onclick=()=>{ segSet("#movType",b.dataset.t); $("#mCat").value = b.dataset.t==="ingreso" && D.cats.includes("Extras") ? "Extras" : $("#mCat").value; });
+$$("#fixType button").forEach(b=>b.onclick=()=>segSet("#fixType",b.dataset.t));
+const num = v => { const n = parseFloat(String(v).replace(",",".")); return isFinite(n)?n:NaN; };
+
+// Movimiento
+let editMov = null;
+function openMov(m){
+  editMov = m ? m.id : null;
+  $("#movTitle").textContent = m ? "Editar movimiento" : "Nuevo movimiento";
+  segSet("#movType", m ? m.type : "gasto");
+  $("#mAmt").value = m ? m.amount : "";
+  $("#mCon").value = m ? m.concept : "";
+  $("#mCat").value = m ? m.category : (D.cats.includes("Comida")?"Comida":D.cats[0]);
+  const def = cur===ymOf(today) ? ymOf(today)+"-"+pad(today.getDate()) : cur+"-01";
+  $("#mDate").value = m ? m.date : def;
+  $("#mDel").classList.toggle("hidden", !m);
+  openS("#movSheet"); if(!m) setTimeout(()=>$("#mAmt").focus(),150);
+}
+$("#fab").onclick=()=>openMov(null);
+$("#mSave").onclick=()=>{
+  const amount = num($("#mAmt").value);
+  if(!(amount>0)){ $("#mAmt").focus(); return; }
+  const date = $("#mDate").value || (cur+"-01");
+  const o = {type:segGet("#movType"), amount, concept:$("#mCon").value.trim(), category:$("#mCat").value, date};
+  if(editMov){ Object.assign(D.moves.find(m=>m.id===editMov), o); } else D.moves.push(Object.assign({id:uid()},o));
+  closeS(); save();
+};
+$("#mDel").onclick=()=>{ if(confirm("¿Borrar este movimiento?")){ D.moves = D.moves.filter(m=>m.id!==editMov); closeS(); save(); } };
+$("#movList").onclick=e=>{ const r=e.target.closest("[data-mov]"); if(r) openMov(D.moves.find(m=>m.id===r.dataset.mov)); };
+
+// Fijo
+let editFix = null;
+function openFix(f){
+  editFix = f ? f.id : null;
+  $("#fixTitle").textContent = f ? "Editar fijo" : "Nuevo fijo";
+  segSet("#fixType", f ? f.type : "gasto");
+  $("#fName").value = f ? f.name : ""; $("#fAmt").value = f ? f.amount : "";
+  $("#fCat").value = f ? f.category : (D.cats.includes("Vivienda")?"Vivienda":D.cats[0]);
+  $("#fDay").value = f && f.day ? f.day : ""; $("#fFrom").value = f ? (f.from||"") : cur; $("#fTo").value = f ? (f.to||"") : "";
+  $("#fDel").classList.toggle("hidden", !f);
+  openS("#fixSheet");
+}
+$("#addFixBtn").onclick=()=>openFix(null);
+$("#fSave").onclick=()=>{
+  const amount = num($("#fAmt").value), name=$("#fName").value.trim();
+  if(!name){ $("#fName").focus(); return; }
+  if(!(amount>=0)){ $("#fAmt").focus(); return; }
+  const day = parseInt($("#fDay").value)||null;
+  const o = {type:segGet("#fixType"), name, amount, category:$("#fCat").value, day, from:$("#fFrom").value||null, to:$("#fTo").value||null};
+  if(editFix) Object.assign(D.fixed.find(f=>f.id===editFix), o); else D.fixed.push(Object.assign({id:uid()},o));
+  closeS(); save();
+};
+$("#fDel").onclick=()=>{
+  if(confirm("¿Borrar este fijo de TODOS los meses?\n\nSi solo ha dejado de pagarse, mejor pon una fecha en “Termina en” para conservar el historial.")){
+    D.fixed = D.fixed.filter(f=>f.id!==editFix);
+    Object.values(D.paid).forEach(p=>delete p[editFix]); Object.values(D.overrides).forEach(p=>delete p[editFix]);
+    closeS(); save();
+  }
+};
+$("#fixInList").onclick = $("#fixOutList").onclick = e=>{ const r=e.target.closest("[data-fix]"); if(r) openFix(D.fixed.find(f=>f.id===r.dataset.fix)); };
+
+// Fijos del mes: pagado / ajuste
+let ovId = null;
+$("#fixMonthList").onclick=e=>{
+  const p=e.target.closest("[data-paid]");
+  if(p){ const id=p.dataset.paid; D.paid[cur]=D.paid[cur]||{}; if(D.paid[cur][id]) delete D.paid[cur][id]; else D.paid[cur][id]=true; save(); return; }
+  const o=e.target.closest("[data-ov]");
+  if(o){ ovId=o.dataset.ov; const f=fixedFor(cur).find(x=>x.id===ovId); $("#ovTitle").textContent=f.name+" — "+monthName(cur); $("#ovAmt").value=f.amt; openS("#ovSheet"); }
+};
+$("#ovSave").onclick=()=>{ const a=num($("#ovAmt").value); if(!(a>=0)) return; D.overrides[cur]=D.overrides[cur]||{}; D.overrides[cur][ovId]=a; closeS(); save(); };
+$("#ovReset").onclick=()=>{ if(D.overrides[cur]) delete D.overrides[cur][ovId]; closeS(); save(); };
+
+/* ---------- AJUSTES ---------- */
+$("#budgetIn").onchange=e=>{ const n=num(e.target.value); D.budget = n>0?n:null; save(); };
+$("#addCatBtn").onclick=()=>{ const c=$("#newCat").value.trim(); if(c && !D.cats.includes(c)){ D.cats.push(c); $("#newCat").value=""; save(); } };
+$("#catEdit").onclick=e=>{ const b=e.target.closest("[data-delcat]"); if(b && D.cats.length>1){ D.cats.splice(+b.dataset.delcat,1); save(); } };
+
+async function download(name, text, type){
+  const blob = new Blob([text],{type});
+  // En iPhone (sobre todo como app de pantalla de inicio) se usa el menú Compartir → "Guardar en Archivos"
+  try{
+    const file = new File([blob], name, {type});
+    if(/iPhone|iPad|iPod|Android/i.test(navigator.userAgent) && navigator.canShare && navigator.canShare({files:[file]})){
+      await navigator.share({files:[file], title:name});
+      return;
+    }
+  }catch(e){ if(e && e.name==="AbortError") return; }
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name;
+  document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },1000);
+}
+$("#expBtn").onclick=()=>{
+  D.lastBackup = Date.now();
+  const d=new Date(); download(`miscuentas-copia-${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}.json`, JSON.stringify(D,null,1), "application/json");
+  save();
+};
+$("#impBtn").onclick=()=>$("#impFile").click();
+$("#impFile").onchange=e=>{
+  const f=e.target.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=()=>{
+    try{
+      const d=JSON.parse(r.result);
+      if(!d || !Array.isArray(d.fixed) || !Array.isArray(d.moves)) throw 0;
+      if(confirm(`Esta copia tiene ${d.fixed.length} fijos y ${d.moves.length} movimientos.\n\nSe reemplazarán los datos actuales de este dispositivo. ¿Continuar?`)){
+        D = Object.assign(blank(), d); save(); alert("Copia cargada ✓");
+      }
+    }catch(err){ alert("Ese archivo no es una copia válida de Mis Cuentas."); }
+    e.target.value="";
+  };
+  r.readAsText(f);
+};
+$("#csvBtn").onclick=()=>{
+  const q = s => '"'+String(s??"").replace(/"/g,'""')+'"';
+  const n = v => String(Math.round(v*100)/100).replace(".",",");
+  const rows=[["Mes","Fecha","Tipo","Fijo/Variable","Concepto","Categoría","Importe","Pagado"]];
+  const all = new Set(D.moves.map(m=>m.date.slice(0,7)));
+  D.fixed.forEach(f=>{ let ym=f.from||ymOf(today); const end=f.to||ymOf(today); let g=0; while(ym<=end && g++<240){ all.add(ym); ym=shiftMonth(ym,1);} });
+  [...all].sort().forEach(ym=>{
+    fixedFor(ym).forEach(f=>rows.push([ym, f.day?ym+"-"+pad(Math.min(f.day,daysIn(ym))):"", f.type, "Fijo", f.name, f.category, n(f.type==="gasto"?-f.amt:f.amt), f.paid?"Sí":"No"]));
+    movesFor(ym).reverse().forEach(m=>rows.push([ym, m.date, m.type, "Variable", m.concept, m.category, n(m.type==="gasto"?-m.amount:m.amount), ""]));
+  });
+  download("miscuentas.csv", "﻿"+rows.map(r=>r.map(q).join(";")).join("\r\n"), "text/csv");
+};
+$("#wipeBtn").onclick=()=>{ if(confirm("¿Seguro? Se borrará TODO de este dispositivo. Guarda una copia antes si la necesitas.")){ D=blank(); save(); } };
+
+render();
+// Funcionamiento sin internet (solo cuando se sirve desde una web, no al abrir el archivo directamente)
+if("serviceWorker" in navigator && location.protocol.startsWith("http")){
+  navigator.serviceWorker.register("sw.js").catch(()=>{});
+}
+// Pide al navegador que no borre los datos guardados
+try{ navigator.storage && navigator.storage.persist && navigator.storage.persist(); }catch(e){}
+})();
+</script>
+</body>
+</html>
